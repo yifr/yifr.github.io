@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Beat Weaver</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body onload = 'initialize(32)'>
+
+	<div class = "header" style="color: beige; ">
+	<h1>BEAT WEAVER</h1>
+	<h2>A Drum Sequencer</h2>
+	<h5>by: Yoni Friedman</h5>
+	</div>
+
+	<div style="align-content: center;">
+		<p style = " height: 0%"; class = "text">BPM: <span id="tempo"></span></p>
+ 		<input type="range" min="40" max="240" value="120" class="slider" id="Range"> 
+		<table id = "TABLE"></table>
+		<button class ="button"; onclick="erase()">Clear</button>
+		<button class = "button"; onclick = "play()";>Play</button>
+		<button class = "button"; onclick = "pause()">Pause</button>
+		<div>
+			<button class = "button" onclick="changeTicks(24)">3/4</button>
+			<button class = "button" onclick = "changeTicks(32)">4/4</button>
+			<button class = "button" onclick = "changeTicks(20)">5/8</button>
+			<button class = "button" onclick = "changeTicks(28)">7/8</button>
+		</div>
+	</div>
+
+	<script>
+		var table = document.getElementById("TABLE");
+
+		var handle; // handle for setintveral()
+
+		var beat = 0;	
+
+	/*** Slider mechanincs for setting tempo ***/
+		var slider = document.getElementById("Range");
+		var bpm = document.getElementById("tempo");
+		bpm.innerHTML = slider.value;	
+		var BPM = bpm.innerHTML;
+		slider.oninput = function() {	
+	  		bpm.innerHTML = this.value;
+	  		pause();
+	  		play();
+			}
+	/*************************************/
+
+		var sounds = [new Audio('cymbal (1).wav'),
+						new Audio('hi hat (6).wav'), 
+						new Audio('snare (1).WAV'), 
+						new Audio('kick (1).WAV'), 
+						new Audio('hi hat open (8).WAV'),
+						new Audio('tom (8).WAV'),
+						new Audio('clap (7).WAV')
+						];
+		/*Create initial table */
+		function initialize(ticks)	
+		{
+		for(var i = 0; i < sounds.length; i++){
+				var row = table.insertRow(i);
+
+			for(var j = 0; j < ticks; j++) {
+				var cell = row.insertCell(j);
+				cell.isOn = false;
+				assignClick(cell);
+			}
+		}			
+	}
+
+
+	//Changes color of cell when clicked
+	function assignClick(cell)
+	{
+		cell.addEventListener("mousedown",function(){
+			cell.isOn = !cell.isOn;
+			if(cell.isOn){
+  				cell.style.backgroundColor = "red";
+   			} else {
+   				cell.style.backgroundColor = "black";
+   				}
+   			});
+	}
+
+	function changeTicks(ticks) {
+		for(var i = 0; i < sounds.length; i++) {
+			document.getElementById("TABLE").deleteRow(0);
+		}
+		initialize(ticks);
+		pause();
+		erase();
+	}
+
+	function erase()
+	{
+		pause();
+		for(var i = 0; i < sounds.length; i++){	//rows
+			for(var j = 0; j < table.rows[0].cells.length; j++) {	//columns
+				table.rows[i].cells[j].isOn = false;
+				table.rows[i].cells[j].style.backgroundColor = 'black';
+			}
+		}
+		beat = 0;	//Starts the beat over from beginning
+	}
+
+	function getInterval()
+	{
+		BPM = bpm.innerHTML;
+		var interval = 60000 / BPM / 4;
+		return interval;
+	}
+
+	function play()
+	{
+		clearInterval(handle);
+		handle = setInterval(playBeat, getInterval());
+	}
+
+	function pause()
+	{
+		clearInterval(handle);
+	}
+
+	function playBeat()
+	{
+		var length = table.rows[0].cells.length;
+		
+		for(var i = 0; i < table.rows.length; i++) {
+			//Change rows as beat progresses
+			table.rows[i].cells[beat].style.backgroundColor = 'white';
+			if(beat % 4 == 0) {
+				table.rows[i].cells[beat].style.backgroundColor = 'rgb(255,32,21)';
+			}
+			if(table.rows[i].cells[beat].isOn) {
+				table.rows[i].cells[beat].style.backgroundColor = 'yellow';
+			}
+			/*Change previous color back to normal*/
+			if(beat > 0) {
+				var cell = table.rows[i].cells[beat-1];
+				if(cell.isOn) {
+					cell.style.backgroundColor = 'red';
+				} else {
+					cell.style.backgroundColor = 'black';
+				}
+			} else {	//Change the color of 
+				var cell = table.rows[i].cells[length - 1];
+				if(cell.isOn){
+					cell.style.backgroundColor = 'red';
+				} else {
+				 	cell.style.backgroundColor = 'black';
+					}
+				}
+			/************************************/
+			if(table.rows[i].cells[beat].isOn){		//play sound
+				sounds[i].currentTime = 0.000000001;	//Trigger audio clip to play from beginning
+				sounds[i].play();
+			}
+		}
+		beat = (beat + 1) % length;
+	}
+
+	function myFunction() 
+	{
+  	 	 document.getElementById("myDropdown").classList.toggle("show");
+	}
+
+	// Close the dropdown if the user clicks outside of it
+	window.onclick = function(event) 
+	{
+  		if (!event.target.matches('.dropbtn')) {
+
+    	var dropdowns = document.getElementsByClassName("dropdown-content");
+    	var i;
+    	for (i = 0; i < dropdowns.length; i++) {
+     		 var openDropdown = dropdowns[i];
+      		if (openDropdown.classList.contains('show')) {
+       			 openDropdown.classList.remove('show');
+      		}
+    	}
+  	}
+}
+
+	</script>
+</body>
+</html>

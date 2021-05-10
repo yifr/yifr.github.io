@@ -1,0 +1,86 @@
+body, html {
+    		height: 100%;
+    		margin: 0;
+		}
+
+		.parallax1 { 
+		    /* The image used */
+		    background-image: url("media/tahoe.jpg");
+
+		    /* Set a specific height */
+		    height: 100%;
+
+		    /* Create the parallax scrolling effect */
+		    background-attachment: fixed;
+		    background-position: center;
+		    background-repeat: no-repeat;
+		    background-size: cover;
+		}
+		
+		.bg {
+		    background-image: url("media/tahoe.jpg");
+		    height: 100%; 
+
+		    /* Center and scale the image nicely */
+		    background-position: center;
+		    background-repeat: no-repeat;
+		    background-size: cover;
+		    min-width: 100%;
+  			min-height: 100%;
+		}
+		.container-table {
+		    display: table;
+		}
+		.vertical-center-row {
+		    display: table-cell;
+		    vertical-align: middle;
+		}
+		.center {
+			margin-top: 10%;
+			color: beige;
+			padding: 25px;
+		}
+		h1 {
+			font-size: 64px;
+			font-weight: 10%;
+			letter-spacing: 1.5px;
+		}
+		.icons {
+			font-size: 52px;
+			padding: 25px;
+			background-color: rgba(30, 30, 30, .25);
+		}
+	
+		i{
+			color: white;
+		}
+		a:hover i{
+			font-size: 58px;
+			color: lightblue;
+		}
+
+		.description {
+			font-size: 24px;
+			color: white;
+		}
+		
+		a:hover ~ .description {
+			
+			color: lightblue;
+		}
+		
+		.typewriter  {
+			  overflow: hidden; /* Ensures the content is not revealed until the animation */
+			  border-right: .15em solid rgb(190, 200, 273); /* The typwriter cursor */
+			  white-space: nowrap; /* Keeps the content on a single line */
+			  margin: 0 auto; /* Gives that scrolling effect as the typing happens */
+			  letter-spacing: .15em; /* Adjust as needed */
+			  animation: 
+			    typing 3.5s steps(40, end),
+			    blink-caret .75s step-end infinite;
+		}
+		/* The typing effect */
+		@keyframes typing {
+  			from { width: 0 }
+  			to { width: 100% }
+		}

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="UTF-8">
+    <title>Gestalt Perception Experiment</title>
+    <script src="jspsych-6.3.1/jspsych.js"></script>
+    <script src="jspsych-6.3.1/plugins/jspsych-html-button-response.js"></script>
+    <script src="jspsych-6.3.1/plugins/jspsych-video-button-response.js"></script>
+    <script src="jspsych-6.3.1/plugins/jspsych-preload.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="jspsych-6.3.1/css/jspsych.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+</body>
+<script>
+    function shuffle(array) {
+        var currentIndex = array.length, temporaryValue, randomIndex;
+
+        // While there remain elements to shuffle...
+        while (0 !== currentIndex) {
+
+            // Pick a remaining element...
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex -= 1;
+
+            // And swap it with the current element.
+            temporaryValue = array[currentIndex];
+            array[currentIndex] = array[randomIndex];
+            array[randomIndex] = temporaryValue;
+        }
+
+        return array;
+    }
+
+    function getTrial(scene_dir) {
+        var stims = shuffle(['gt_mesh.png', 'distractor_1.png']);
+        var trial_data = { 'scene_dir': scene_dir,
+                            'correct_answer': stims.indexOf('gt_mesh.png') 
+                        }
+
+        fetch('images/' + scene_dir + '/params.json',
+            { 'mode': 'cors', 'credentials': 'same-origin' }).then(response => response.json())
+            .then(data => {
+                var mesh_0 = data['mesh_0']['exponents']
+                var mesh_1 = data['mesh_1']['exponents']
+                trial_data['gt_params'] = mesh_0
+                trial_data['distractor_params'] = mesh_1
+                trial_data['distance'] = (mesh_0[0] - mesh_1[0]) ** 2 + (mesh_0[1] - mesh_1[1]) ** 2
+            })
+
+        var buttons_html = [`
+                    <p> Option 1: </p>
+                    <button class="jspsych-btn" style="width: 100%; height:25%;">
+                        <img src="images/${scene_dir}/%choice%" style="width: 100%; height: 100%;" />
+                    </button>
+                    `,
+        `<p> Option 2: </p>
+                    <button class="jspsych-btn" style="width: 100%; height:25%;">
+                        <img src="images/${scene_dir}/%choice%" style="width: 100%; height: 100%;" />
+                    </button>
+                    `,
+
+        ]
+        
+        var trial = {
+            type: 'video-button-response',
+            choices: stims,
+            prompt: '<br><br>Which shape matches the one from the video?',
+            stimulus: [`videos/${scene_dir}.mp4`],
+            button_html: buttons_html,
+            data: trial_data
+        }
+
+        return trial;
+    }
+
+    async function setUpTimeline() {
+
+        var timeline = [
+            { type: 'preload',
+            auto_preload: true }
+        ];
+
+
+        scene = 0;
+        trials = []
+        for (var i = 0; i < 90; i++) {
+            if (i == 30 || i == 60) {
+                scene += 20;
+            }
+            var scene_dir = `scene_${String(scene).padStart(3, '0')}`;
+            trial = getTrial(scene_dir);
+            trials.push(trial);
+            scene += 1;
+        }
+
+        function save_data() {
+            jsPsych.data.displayData()
+        }
+
+        await Promise.all(trials).then(trials => {
+            timeline.push(...trials);
+            jsPsych.init({
+                timeline: timeline,
+                show_progress_bar: true,
+                on_finish: save_data
+            })
+        })   
+    }
+
+
+    setUpTimeline();
+
+</script>
+
+</html>
