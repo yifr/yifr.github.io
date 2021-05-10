@@ -1,0 +1,1 @@
+{"mesh_0": {"exponents": [0.8, 0.05], "scaling": [1, 1, 1, 2], "type": "superellipsoid"}, "mesh_1": {"exponents": [2.18, 1.85], "scaling": [1, 1, 1, 2], "type": "superellipsoid"}, "mesh_2": {"exponents": [2.41, 0.11], "scaling": [1, 1, 1, 2], "type": "superellipsoid"}, "mesh_3": {"exponents": [0.91, 0.66], "scaling": [1, 1, 1, 2], "type": "superellipsoid"}}
