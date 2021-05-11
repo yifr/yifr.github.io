@@ -174,7 +174,7 @@
             }
             data['user_id'] = user_id
 
-            fetch('save_json.php', {
+            $.post('save_json.php', {
                 method: 'POST', 
                 mode: 'cors', credentials: 'same-origin', 
                 headers: {'Content-Type': 'application/json'}, 
