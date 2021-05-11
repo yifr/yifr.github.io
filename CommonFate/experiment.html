@@ -8,9 +8,11 @@
     <script src="jspsych-6.3.1/jspsych.js"></script>
     <script src="jspsych-6.3.1/plugins/jspsych-video-button-response.js"></script>
     <script src="jspsych-6.3.1/plugins/jspsych-instructions.js"></script>
+    <script src="jspsych-6.3.1/plugins/jspsych-survey-text.js"></script>
     <script src="jspsych-6.3.1/plugins/jspsych-preload.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link href="jspsych-6.3.1/css/jspsych.css" rel="stylesheet" type="text/css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
@@ -40,7 +42,7 @@
     function getTrial(scene_dir) {
         var stims = shuffle(['gt_mesh.png', 'distractor_1.png']);
         var trial_data = { 'scene_dir': scene_dir,
-                            'correct_answer': stims.indexOf('gt_mesh.png') 
+                            'answer': stims.indexOf('gt_mesh.png') 
                         }
 
         fetch('images/' + scene_dir + '/params.json',
@@ -73,7 +75,14 @@
             prompt: '<br><br>Which shape matches the one from the video?',
             stimulus: [`videos/${scene_dir}.mp4`],
             button_html: buttons_html,
-            data: trial_data
+            data: trial_data,
+            on_finish: function(data) { 
+                if (jsPsych.pluginAPI.compareKeys(data.response, data.answer)) {
+                    data.correct = true;
+                } else {
+                    data.correct = false;
+                }
+            }
         }
 
         return trial;
@@ -83,7 +92,10 @@
 
         var timeline = [
             { type: 'preload',
-            auto_preload: true }
+            auto_preload: true },
+            {type: 'survey-text',
+            questions: [{prompt: "What's your name / user id?", name: 'user_id'}]
+            }
         ];
 
         var instruction_pages = [
@@ -91,7 +103,10 @@
             '<p>Welcome to the experiment! To navigate through these instructions, press the forward and back buttons, or use the right and left arrows.</p>',
             
             // Page 2
-            '<p>In this experiment you will be asked to determine a camoflauged shape by watching as the shape rotates 360 degrees.</p>',
+            `<p>In this experiment you will be asked to identify a shape by watching a video where the shape rotates 360 degrees, like this:</p>
+            <video autoplay muted>
+                <source src="videos/instructions/no_texture.mp4" type="video/mp4">
+            </video>`,
            
             // Page 3
             `<p>The shapes in question will be camoflauged with dots. Your job is to determine the correct shape. </p>
@@ -100,17 +115,34 @@
                     <source src='videos/instructions/plain_example.mp4' type='video/mp4'>
                 </video> 
             <p> The underlying shape looks like: </p>
-                <img src='images/scene_150/gt_mesh.png'/>`,
+                <img src='images/scene_150/gt_mesh.png'/ style="width: 50%; height: 50%; align: center">`,
             
             // Page 4
             `<p> During the experiment, you will need to choose between two possible shapes. </p>
-             <p> Sometimes the two candidate shapes will look very similar, sometimes they will look very different. The video will only play once, so just do your best to guess the correct answer.</p>`,
+             <p> Sometimes the two candidate shapes will look very similar, like these two examples: <p>
+            <div>
+                <img src="images/scene_152/gt_mesh.png" style="width: 33%; height: 33%; margin: -5px;" /> 
+                <img src="images/scene_153/gt_mesh.png" style="width: 33%; height: 33%; margin: -5px;" /> 
+            </div>
+             <p> Sometimes they will look very different, like these two examples: </p>
+             <div>
+                <img src="images/scene_150/gt_mesh.png" style="width: 33%; height: 33%; margin: -5px;" /> 
+                <img src="images/scene_151/gt_mesh.png" style="width: 33%; height: 33%; margin: -5px;" /> 
+            </div>
+            <p> The video will only play once, so do your best to guess the correct answer even when it may not be obvious.</p>`,
              
              // Page 5
              '<p> If you think you know the correct answer before the video finishes, feel free to select it and move on! </p>',
 
-             // Page 6
-            'Ready to begin?'
+            // Page 6
+            `<p> You will see three phases of examples: </p>
+             <p> In the <strong>first phase</strong>, there will be no background. 
+                In the <strong>second phase</strong>, the background will have the same texture as the shape. 
+                In the  <strong>last phase</strong>, the texture in the background will move at a similar rate as the shape itself.
+            </p>`,
+
+             // Page 7
+            '<h3> Ready to begin? </h3>'
         ];
 
         var instructions = {
@@ -123,7 +155,7 @@
 
         scene = 0;
         trials = []
-        for (var i = 0; i < 90; i++) {
+        for (var i = 0; i < 10; i++) {
             if (i == 30 || i == 60) {
                 scene += 20;
             }
@@ -134,7 +166,20 @@
         }
 
         function save_data() {
-            jsPsych.data.displayData()
+            jsPsych.data.displayData();
+            var data = jsPsych.data.get();
+            var user_id = data.filter({trial_type: 'survey-text'}).select('user_id');
+            if (!user_id) {
+                user_id = jsPsych.randomization.randomID(15);
+            }
+            data['user_id'] = user_id
+
+            fetch('save_json.php', {
+                method: 'POST', 
+                mode: 'cors', credentials: 'same-origin', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify(data)
+            });
         }
 
         await Promise.all(trials).then(trials => {
