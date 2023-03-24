@@ -22,7 +22,8 @@ body, html {
 		}
 		.icons {
 			font-size: 52px;
-			padding: 25px;
+			margin: auto;
+			width: 50%;
 			/* background-color: rgba(25, 8, 121, 0.25); */
 		}
 	
