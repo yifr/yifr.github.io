@@ -1,46 +1,52 @@
-body, html {
-    		height: 100%;
-    		margin: 0;
-		}
+body,
+html {
+	height: 100%;
+	margin: 0;
+}
 
-				.container-table {
-		    display: table;
-		}
-		.vertical-center-row {
-		    display: table-cell;
-		    vertical-align: middle;
-		}
-		.center {
-			margin-top: 10%;
-			color: beige;
-			padding: 25px;
-		}
-		h1 {
-			font-size: 64px;
-			font-weight: 10%;
-			letter-spacing: 1.5px;
-		}
-		.icons {
-			font-size: 52px;
-			margin: auto;
-			width: 50%;
-			/* background-color: rgba(25, 8, 121, 0.25); */
-		}
-	
-		i{
-			color: rgb(28, 5, 5);
-		}
-		a:hover i{
-			font-size: 58px;
-			color: rgba(39, 4, 214, 0.932);
-		}
+.container-table {
+	display: table;
+}
 
-		.description {
-			font-size: 24px;
-			color: rgba(25, 8, 121, 0.25);
-		}
-		
-		a:hover ~ .description {
-			color: rgba(39, 4, 214, 0.932);
-		}
-		
+.vertical-center-row {
+	display: table-cell;
+	vertical-align: middle;
+}
+
+.center {
+	margin-top: 10%;
+	color: beige;
+	padding: 25px;
+}
+
+h1 {
+	font-size: 64px;
+	font-weight: 10%;
+	letter-spacing: 1.5px;
+}
+
+.icons {
+	font-size: 52px;
+	margin: auto;
+	width: 50%;
+	/* background-color: rgba(25, 8, 121, 0.25); */
+}
+
+i {
+	color: rgb(28, 5, 5);
+}
+
+a:hover i {
+	font-size: 58px;
+	color: rgba(39, 4, 214, 0.932);
+}
+
+.description {
+	font-size: 24px;
+	color: rgba(25, 8, 121, 0.25);
+}
+
+a:hover~.description {
+	color: rgba(39, 4, 214, 0.932);
+}
+
